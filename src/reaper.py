@@ -28,23 +28,25 @@ def main():
                       help="keeps the calculated hashes")
     
     (options, args) = parser.parse_args()
-    print "extension: " + options.extension
-    if options.recursive:
-        print "recursive: True"
-        
-    print "arguments: " + str(len(args))
+
     if len(args) != 1:
         parser.print_help()
         sys.exit(1)
     
     path=args[0]
     
+    if options.extension:
+        print "extension: " + options.extension
+
+    if options.recursive:
+        print "recursive: True"
+    
     if os.path.exists(path) != True:
         parser.print_help()
         print "path " + path + " does not exists"
         sys.exit(1)
         
-    br = MyBrowser()
+    br = MyBrowser(options.extension, options.recursive)
     br.digest(path)
     print "Done"
 

@@ -11,14 +11,19 @@ from digester import FileDigester
 from os.path import join 
 from posixpath import splitext
 from pickle import PicklingError, PickleError
+from string import lower
 
 class MyBrowser(object):
+    
+    extension = None
+    recursive = False
 
-
-    def __init__(self):
+    def __init__(self, extension = None, recursive = False):
         '''
         Constructor
         '''
+        self.recursive = recursive
+        self.extension = extension
 
     
     def digest(self, basepath):
@@ -34,16 +39,21 @@ class MyBrowser(object):
         a file named as the original
         '''
         for dirpath, dirnames, filenames in os.walk(walkpath):
-            print "checking " + dirpath
-            for dir in dirnames:
-                self.__walk__(join(dirpath, dir))
+            print "Digesting " + dirpath
+            if self.recursive:
+                for dir in dirnames:
+                    self.__walk__(join(dirpath, dir))
                 
             for file in filenames:
                 if file.startswith("."):
                     continue
                 
+                (name, extension) = splitext(file)
+                if self.extension != None and lower(extension[1:]) != lower(self.extension):
+                    continue
+                
                 filepath = join(dirpath, file)
-                digestedPath = join(dirpath, '.' + splitext(file)[0] + '.digest')
+                digestedPath = join(dirpath, '.' + name + '.digest')
                 
                 if self.__digested__(filepath, digestedPath):
                     continue
