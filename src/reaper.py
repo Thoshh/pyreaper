@@ -5,50 +5,69 @@ Created on 30/01/2010
 '''
 import sys
 import os.path
-from mybrowser import MyBrowser
+
 from optparse import OptionParser
+
+from browser import Walker
 
 
 def main():
-    parser = OptionParser(usage="%prog [options] <path to folder>")
+    parser = OptionParser(usage="%prog [options] <path to folder> <path to folder...>")
     parser.add_option("-e", 
                       "--ext", 
                       dest="extension", 
                       action="store",
-                      help="filters files for the given extension" )
-    parser.add_option("-r",
-                      "--recursive",
-                      dest="recursive",
+                      help="only applies to the given extension" )
+    parser.add_option("-s",
+                      "--store-hashes",
+                      dest="storehash",
                       action="store_true",
-                      help="Recurses subdirectories")
-    parser.add_option("-k",
-                      "--keep-hash-files",
-                      dest="keephash",
+                      help="store calculated hashes in .digest hidden files")
+    parser.add_option("-v",
+                      "--verbose",
+                      dest="verbose",
                       action="store_true",
-                      help="keeps the calculated hashes")
+                      help="outputs much more information during process, " + 
+                      "sometimes even too much")
+    parser.add_option("-i",
+                      "--ignore-stored-hashes",
+                      dest="ignorehashes",
+                      action="store_true",
+                      help="ignores stored calculated hashes in .digest " + 
+                      "hidden files, this means every hash will be " + 
+                      "recalculated")
+    parser.add_option("-o",
+					  "--output-path",
+					  dest="outputpath",
+					  action="store",
+					  help="Moves detected collisionated files to the given " + 
+					  "output path")
     
     (options, args) = parser.parse_args()
 
-    if len(args) != 1:
+    if not args:
         parser.print_help()
         sys.exit(1)
     
-    path=args[0]
-    
-    if options.extension:
-        print "extension: " + options.extension
-
-    if options.recursive:
-        print "recursive: True"
-    
-    if os.path.exists(path) != True:
-        parser.print_help()
-        print "path " + path + " does not exists"
-        sys.exit(1)
+    br = Walker(options.extension, \
+			options.storehash, \
+			options.verbose, \
+			options.ignorehashes)
+    for path in args:
         
-    br = MyBrowser(options.extension, options.recursive)
-    br.digest(path)
+        if not os.path.exists(path):
+            parser.print_help()
+            print "path " + path + " does not exists"
+            sys.exit(1)
+            
+        br.digest(path)
+    
+    duplicated = br.getCollisions()
+    if duplicated:
+        print "Duplicateds found"
+    
     print "Done"
+    sys.exit(0)
 
 
 if __name__ == '__main__':
