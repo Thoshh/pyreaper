@@ -65,7 +65,7 @@ class Walker(object):
             dirpath = d[0]
             filenames = d[2]
                
-            self._debug("Digesting " + dirpath)
+            self._out("Digesting " + dirpath)
             
             for file in filenames:
                 if file.startswith("."): # ignore hidden files
@@ -90,11 +90,11 @@ class Walker(object):
                     predigested = True
                 
                 if not digested:
-                    self._debug('File ' + filepath + ' could not be digested')
+                    self._out('File ' + filepath + ' could not be digested')
                 elif not predigested:
-                    self._debug('File ' + filepath + ' digested')
+                    self._out('File ' + filepath + ' digested')
                 else:
-                    self._debug('File ' + filepath + ' already digested, skipping')
+                    self._out('File ' + filepath + ' already digested, skipping')
                 
                 if digested:
                     self._putValue(digested)
@@ -103,19 +103,27 @@ class Walker(object):
     def _digest(self, filepath, digestedPath):
         ''' Actually digest the given file and stores the digest result in the given path '''
         digester = FileDigester(filepath)
-        digested = digester.digest()
+        try:
+            digested = digester.digest()
+        except IOError as e:
+            self._out("Cannot open file {0} for reading, skipping".format(filepath))
+            return None
+        
         if digested == None:
             return None
         
         if self._store_hash:
             try:
+                self._debug("Saving digest status to file {0}".format(digestedPath))
                 digestedFile = io.open(digestedPath, 'bw')
                 pickle.dump(digested, digestedFile)
                 digestedFile.close()
             except PicklingError as e:
-                self._debug(e[0])
+                self._out(str(e[1]))
+            except IOError as e:
+                self._out("Cannot open file {0} for writing".format(digestedPath))
             except Exception as e:
-                self._debug(e[0])
+                self._debug(e.__class__ + " - " + str(e[1]))
         
         return digested
         
@@ -168,7 +176,7 @@ class Walker(object):
     
     
     def _out(self, message):
-        sys.stdout.write("Walker: " + message + "\n")
+        sys.stdout.write(message + "\n")
     
     
     def _debug(self, message):

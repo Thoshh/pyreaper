@@ -53,8 +53,8 @@ def main():
 			options.storehash, \
 			options.verbose, \
 			options.ignorehashes)
+    
     for path in args:
-        
         if not os.path.exists(path):
             parser.print_help()
             print "path " + path + " does not exists"
