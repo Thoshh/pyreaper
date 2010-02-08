@@ -36,12 +36,29 @@ def main():
                       help="ignores stored calculated hashes in .digest " + 
                       "hidden files, this means every hash will be " + 
                       "recalculated")
-    parser.add_option("-o",
-					  "--output-path",
-					  dest="outputpath",
+    parser.add_option("-i",
+                      "--interactive",
+                      dest="keepbest",
+                      action="store_true",
+                      help="interactive mode, will ask for each file")
+    parser.add_option("-k",
+                      "--keep-best",
+                      dest="keepbest",
+                      action="store_true",
+                      help="keeps the best sample of the duplicated files " +
+                      "in the original folder (for best understand longest " + 
+                      "filename)")
+    parser.add_option("-m",
+					  "--move-dups",
+					  dest="movedups",
 					  action="store",
 					  help="Moves detected collisionated files to the given " + 
-					  "output path")
+					  "path")
+    parser.add_option("-d",
+                      "--delete-dups",
+                      dest="deletedups",
+                      action="store_true",
+                      help="Deletes detected collisionated files")
     
     (options, args) = parser.parse_args()
 
