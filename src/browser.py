@@ -22,13 +22,22 @@ class Walker(object):
     _verbose = False
     _ignore_hashes = False
     
+    _interactive = False
+    _keepbest=False
+    _movedups=False
+    _deletedups=False
+    
     _hashDictionary = {}
     _collisions = {}
 
     def __init__(self, extension = None, \
                  store_hash = False, \
                  verbose = False, \
-                 ignore_hashes = False):
+                 ignore_hashes = False, \
+                 interactive = False, \
+                 keepbest = False, \
+                 movedups = False, \
+                 deletedups = False):
         '''
         Constructor
         '''
@@ -36,7 +45,10 @@ class Walker(object):
         self._store_hash = store_hash
         self._verbose = verbose
         self._ignore_hashes = ignore_hashes
-        
+        self._interactive = interactive
+        self._keepbest = keepbest
+        self._movedups = movedups
+        self._deletedups = deletedups
     
     def digest(self, basepath):
         ''' Starts the digestion of files '''

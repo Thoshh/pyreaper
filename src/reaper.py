@@ -29,7 +29,7 @@ def main():
                       action="store_true",
                       help="outputs much more information during process, " + 
                       "sometimes even too much")
-    parser.add_option("-i",
+    parser.add_option("",
                       "--ignore-stored-hashes",
                       dest="ignorehashes",
                       action="store_true",
@@ -38,7 +38,7 @@ def main():
                       "recalculated")
     parser.add_option("-i",
                       "--interactive",
-                      dest="keepbest",
+                      dest="interactive",
                       action="store_true",
                       help="interactive mode, will ask for each file")
     parser.add_option("-k",
@@ -69,7 +69,11 @@ def main():
     br = Walker(options.extension, \
 			options.storehash, \
 			options.verbose, \
-			options.ignorehashes)
+			options.ignorehashes, \
+            options.interactive, \
+            options.keepbest, \
+            options.movedups, \
+            options.deletedups)
     
     for path in args:
         if not os.path.exists(path):
