@@ -23,7 +23,7 @@ class Walker(object):
     _ignore_hashes = False
     
     _interactive = False
-    _keepbest=False
+    _keep=False
     _movedups=False
     _deletedups=False
     
@@ -35,7 +35,7 @@ class Walker(object):
                  verbose = False, \
                  ignore_hashes = False, \
                  interactive = False, \
-                 keepbest = False, \
+                 keep = False, \
                  movedups = False, \
                  deletedups = False):
         '''
@@ -46,7 +46,7 @@ class Walker(object):
         self._verbose = verbose
         self._ignore_hashes = ignore_hashes
         self._interactive = interactive
-        self._keepbest = keepbest
+        self._keep = keep
         self._movedups = movedups
         self._deletedups = deletedups
     

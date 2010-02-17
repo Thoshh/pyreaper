@@ -40,10 +40,10 @@ def main():
                       "--interactive",
                       dest="interactive",
                       action="store_true",
-                      help="interactive mode, will ask for each file")
+                      help="interactive mode, will ask for each duplicate")
     parser.add_option("-k",
-                      "--keep-best",
-                      dest="keepbest",
+                      "--keep",
+                      dest="keep",
                       action="store_true",
                       help="keeps the best sample of the duplicated files " +
                       "in the original folder (for best understand longest " + 
@@ -71,7 +71,7 @@ def main():
 			options.verbose, \
 			options.ignorehashes, \
             options.interactive, \
-            options.keepbest, \
+            options.keep, \
             options.movedups, \
             options.deletedups)
     
