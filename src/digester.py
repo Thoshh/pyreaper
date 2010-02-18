@@ -1,7 +1,5 @@
 '''
-Created on 30/01/2010
-
-@author: jim
+@author: pcarranza@gmail.com
 '''
 
 import io

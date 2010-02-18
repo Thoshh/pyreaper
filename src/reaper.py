@@ -1,10 +1,11 @@
+#!/usr/bin/python
 '''
-Created on 30/01/2010
-
-@author: jim
+@author: pcarranza@gmail.com
 '''
 import sys
 import os.path
+
+from cleaner import Cleaner
 
 from optparse import OptionParser
 
@@ -41,24 +42,6 @@ def main():
                       dest="interactive",
                       action="store_true",
                       help="interactive mode, will ask for each duplicate")
-    parser.add_option("-k",
-                      "--keep",
-                      dest="keep",
-                      action="store_true",
-                      help="keeps the best sample of the duplicated files " +
-                      "in the original folder (for best understand longest " + 
-                      "filename)")
-    parser.add_option("-m",
-					  "--move-dups",
-					  dest="movedups",
-					  action="store",
-					  help="Moves detected collisionated files to the given " + 
-					  "path")
-    parser.add_option("-d",
-                      "--delete-dups",
-                      dest="deletedups",
-                      action="store_true",
-                      help="Deletes detected collisionated files")
     
     (options, args) = parser.parse_args()
 
@@ -69,25 +52,29 @@ def main():
     br = Walker(options.extension, \
 			options.storehash, \
 			options.verbose, \
-			options.ignorehashes, \
-            options.interactive, \
-            options.keep, \
-            options.movedups, \
-            options.deletedups)
+			options.ignorehashes)
     
     for path in args:
         if not os.path.exists(path):
             parser.print_help()
-            print "path " + path + " does not exists"
+            print "path {0} does not exists".format(path)
             sys.exit(1)
             
         br.digest(path)
     
-    duplicated = br.getCollisions()
-    if duplicated:
-        print "Duplicateds found"
-    
-    print "Done"
+    duplicates = br.getCollisions()
+    if duplicates:
+        print "Duplicates found..."
+        c = Cleaner(duplicates, \
+                    options.interactive, \
+                    options.verbose)
+        if c.clean():
+            sys.exit(0)
+        else:
+            sys.exit(1)
+    else:
+        print "No duplicates found"
+        
     sys.exit(0)
 
 

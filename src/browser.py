@@ -1,7 +1,5 @@
 '''
-Created on 30/01/2010
-
-@author: jim
+@author: pcarranza@gmail.com
 '''
 import io
 import os
@@ -22,22 +20,13 @@ class Walker(object):
     _verbose = False
     _ignore_hashes = False
     
-    _interactive = False
-    _keep=False
-    _movedups=False
-    _deletedups=False
-    
     _hashDictionary = {}
     _collisions = {}
 
     def __init__(self, extension = None, \
                  store_hash = False, \
                  verbose = False, \
-                 ignore_hashes = False, \
-                 interactive = False, \
-                 keep = False, \
-                 movedups = False, \
-                 deletedups = False):
+                 ignore_hashes = False):
         '''
         Constructor
         '''
@@ -45,10 +34,6 @@ class Walker(object):
         self._store_hash = store_hash
         self._verbose = verbose
         self._ignore_hashes = ignore_hashes
-        self._interactive = interactive
-        self._keep = keep
-        self._movedups = movedups
-        self._deletedups = deletedups
     
     def digest(self, basepath):
         ''' Starts the digestion of files '''
