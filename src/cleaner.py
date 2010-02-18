@@ -34,10 +34,11 @@ class Cleaner(object):
     
     def ask(self, files):
         print ""
-        index = 1
+        maxfile = 1
         for file in files:
-            print "{0} - {1}".format(index, file)
-            index += 1
+            print "{0} - {1}".format(maxfile, file)
+            maxfile += 1
+        
         
         print "[leave empty to ignore these files]"
         pick = raw_input("pick which file survives: ")
@@ -45,13 +46,15 @@ class Cleaner(object):
             return False
         
         elif str(pick).isdigit():
+            index = int(pick)
+            self.debug("deleting index {0} of {1}".format(index, maxfile - 1))
             
-            if int(pick) > index:
+            if index >= maxfile:
                 print "Option not valid (out of range), skipping"
                 return False
             
             else:
-                self.delete(files, int(pick))
+                self.delete(files, index - 1)
                 return True
                 
         else:
@@ -60,15 +63,15 @@ class Cleaner(object):
     
     
     def keep_first(self, files):
-        delete(files, 1)
+        self.delete(files, 1)
     
     
     def delete(self, files, which):
         for index in range(len(files)):
-            if index == which - 1:
+            if index == which:
                 self.debug("keeping {0}".format(files[index]))
             else:
-                self.debug("deleting {0}".format(files[index]))
+                print "deleting {0}".format(files[index])
                 try:
                     os.remove(files[index])
                 except:
