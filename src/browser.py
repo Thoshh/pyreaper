@@ -62,7 +62,7 @@ class Walker(object):
             dirpath = d[0]
             filenames = d[2]
                
-            self._out("Digesting " + dirpath)
+            self._out("Digesting {0}".format(dirpath))
             
             for file in filenames:
                 if file.startswith("."): # ignore hidden files
@@ -73,7 +73,7 @@ class Walker(object):
                     continue
                 
                 filepath = join(dirpath, file)
-                digestedPath = join(dirpath, '.' + name + '.digest')
+                digestedPath = join(dirpath, '.{0}.digest'.format(name))
                 
                 if not self._ignore_hashes:
                     digested = self._digested(filepath, digestedPath)
@@ -87,11 +87,11 @@ class Walker(object):
                     predigested = True
                 
                 if not digested:
-                    self._out('File ' + filepath + ' could not be digested')
+                    self._out('File {0} could not be digested'.format(filepath))
                 elif not predigested:
-                    self._out('File ' + filepath + ' digested')
+                    self._debug('File {0} digested'.format(filepath))
                 else:
-                    self._out('File ' + filepath + ' already digested, skipping')
+                    self._debug('File {0} already digested, skipping'.format(filepath))
                 
                 if digested:
                     self._putValue(digested)

@@ -33,7 +33,7 @@ class Cleaner(object):
         
     
     def ask(self, files):
-        
+        print ""
         index = 1
         for file in files:
             print "{0} - {1}".format(index, file)
