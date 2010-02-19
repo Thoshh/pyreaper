@@ -1,4 +1,3 @@
-#!/usr/bin/python
 '''
 @author: pcarranza@gmail.com
 '''
