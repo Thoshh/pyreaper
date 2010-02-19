@@ -5,9 +5,7 @@ import sys
 import os.path
 
 from cleaner import Cleaner
-
 from optparse import OptionParser
-
 from browser import Walker
 
 

@@ -76,7 +76,10 @@ class Walker(object):
                 digestedPath = join(dirpath, '.{0}.digest'.format(name))
                 
                 if not self._ignore_hashes:
-                    digested = self._digested(filepath, digestedPath)
+                    try:
+                        digested = self._digested(filepath, digestedPath)
+                    except:
+                        digested = None
                 else:
                     digested = None
                     
@@ -150,8 +153,12 @@ class Walker(object):
     
     
     def _putValue(self, digested):
-        hash = digested["hash"]
-        path = digested["path"]
+        if not 'hash' in digested or not 'path' in digested:
+            self._out('Could not use this predigested file, remove it and relaunch process')
+            return
+        
+        hash = digested['hash']
+        path = digested['path']
         
         if self._hashDictionary.has_key(hash):
             self._debug("Collision detected for hash " + hash)

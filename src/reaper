@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-from reaper import reaper
+import sys
+import pyreaper.reaper
 
-if __name__ == "__main__":
-    reaper.main()
+try:
+    sys.exit(pyreaper.reaper.main())
+except KeyboardInterrupt:
+	sys.exit(1)
      
