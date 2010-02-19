@@ -21,6 +21,13 @@ class Cleaner(object):
     
     def clean(self):
         
+        if not self._interactive:
+            sure = raw_input("WARNING this will delete all duplicates found " + \
+                    "but the first one found, are you sure? Y/[N] ")
+            if not sure or not (sure.lower() == "y" or sure.lower() == "yes"):
+                print "Quiting"
+                return False
+        
         for key in self._duplicates.iterkeys():
             files = self._duplicates[key]
             
