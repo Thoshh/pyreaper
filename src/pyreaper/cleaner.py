@@ -26,8 +26,8 @@ class Cleaner(object):
         
         if not self._dontdelete:
             if not self._interactive:
-                sure = raw_input("WARNING this will delete all duplicates found " + \
-                        "but the first one found, are you sure? Y/[N] ")
+                sure = raw_input("WARNING: this will delete all duplicates " + 
+                                 "found but the first one, are you sure? Y/[N] ")
                 if not sure or not (sure.lower() == "y" or sure.lower() == "yes"):
                     print "Quiting"
                     return False

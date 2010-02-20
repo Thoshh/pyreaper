@@ -15,7 +15,6 @@ class FileDigester(object):
     def digest(self):
         f = io.open(self._file, mode="br")
         sh = hashlib.sha1()
-        # md = hashlib.md5()
         size = 0
         while 1:
             line = f.readline(1024)
@@ -23,7 +22,6 @@ class FileDigester(object):
                 break  
             size += len(line)
             sh.update(line)
-            # md.update(line)
         
         if size == 0:
             return None
