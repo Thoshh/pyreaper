@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import sys
-import pyreaper.reaper
+import PyReaper.reaper
 
 try:
-    sys.exit(pyreaper.reaper.main())
+    sys.exit(PyReaper.reaper.main())
 except KeyboardInterrupt:
 	sys.exit(1)
-     
