@@ -73,9 +73,10 @@ class Cleaner(object):
         self.delete(files, 1)
     
     
-    def delete(self, files, which):
-        for index in range(len(files)):
-            if index == which:
+    def delete(self, files, keep):
+        index = 1
+        for file in files:
+            if index == keep:
                 self.debug("keeping {0}".format(files[index]))
             else:
                 print "deleting {0}".format(files[index])
@@ -83,8 +84,8 @@ class Cleaner(object):
                     os.remove(files[index])
                 except:
                     print "Could not delete {0}".format(files[index])
-        
-        pass
+            index += 1
+            
 
     def debug(self, message):
         if self._verbose:
