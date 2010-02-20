@@ -1,5 +1,5 @@
 '''
-@author: pcarranza@gmail.com
+@author: Pablo Carranza <pcarranza@gmail.com>
 '''
 
 import os
