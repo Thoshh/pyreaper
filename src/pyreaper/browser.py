@@ -122,7 +122,7 @@ class Walker(object):
         digester = FileDigester(filepath)
         try:
             digested = digester.digest()
-        except IOError as e:
+        except IOError:
             self._out("Cannot open file {0} for reading, skipping".format(filepath))
             return None
         
