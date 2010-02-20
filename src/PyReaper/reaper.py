@@ -1,4 +1,20 @@
 '''
+PyReaper is a small tool to find and delete duplicated files 
+Copyright (C) 2010  Pablo Carranza
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 @author: Pablo Carranza <pcarranza@gmail.com>
 '''
 import sys
@@ -10,61 +26,64 @@ from browser import Walker
 
 
 def main():
-    parser = OptionParser(usage="%prog [options] <path to folder> "+
-                          "<path to folder...>",
-                          description="Small util that detects duplicated " + 
-                          "files by hashing files and then deletes these " + 
-                          "duplicated files leaving just one of them", 
-                          epilog="Handle with extreme care, use -n option " + 
-                          "first if you are not sure of what are you doing")
+    parser = OptionParser(prog="reaper",
+                          version="0.1.0",
+                          usage="%prog [options] <path to folder> "+
+                          "[<path to folder...>]",
+                          description="PyReaper is a small tool that detects " + 
+                          "duplicated files by hashing them and then deletes " + 
+                          "these duplicated files leaving just one of them", 
+                          epilog="CAUTION: handle with EXTREME CARE, " + 
+                          "use -n option first if you are not sure of " + 
+                          "what are you doing, this thing deletes stuff!!!")
+    parser.add_option("-n",
+                      "--dont-delete",
+                      dest="dontdelete",
+                      action="store_true",
+                      help="skips delete process, useful for only " + 
+                      "detect duplicates or create the digests")
     parser.add_option("-i",
                       "--interactive",
                       dest="interactive",
                       action="store_true",
-                      help="Interactive mode, will ask for each duplicate. " + 
+                      help="interactive mode, will ask for each duplicate. " + 
                       "By default it deletes every duplicate found but " + 
                       "the first one")
     parser.add_option("-s",
                       "--store-hashes",
                       dest="storehash",
                       action="store_true",
-                      help="Store calculated hashes in .digest hidden files " + 
+                      help="store calculated hashes in .digest hidden files " + 
                       "(will delete at the end of the process unless -k " + 
                       "option is indicated)")
     parser.add_option("-k",
                       "--keep-digested",
                       dest="dontclean",
                       action="store_true",
-                      help="Keeps .digest files when finishes")
+                      help="keeps .digest files when finishes")
     parser.add_option("-d",
-                      "--delete-empty-dirs",
+                      "--delete-empty-trees",
                       dest="deletedirs",
                       action="store_true",
-                      help="Deletes empty dirs when finishes")
+                      help="deletes empty trees when finishes")
     parser.add_option("-e", 
                       "--ext", 
                       dest="extension", 
                       action="store",
-                      help="Only digests files with the given extension" )
+                      help="only digests files with the given extension" )
     parser.add_option("-v",
                       "--verbose",
                       dest="verbose",
                       action="store_true",
-                      help="Outputs much more information during process " + 
+                      help="outputs much more information during process " + 
                       "(sometimes even too much)")
     parser.add_option("",
                       "--ignore-stored-hashes",
                       dest="ignorehashes",
                       action="store_true",
-                      help="Ignores stored calculated hashes in .digest " + 
+                      help="ignores stored calculated hashes in .digest " + 
                       "hidden files, this means every hash will be " + 
                       "recalculated")
-    parser.add_option("-n",
-                      "--dont-delete",
-                      dest="dontdelete",
-                      action="store_true",
-                      help="Skips duplicates delete process, " + 
-                      "useful to just detect duplicates or create the digests")
     
     (options, args) = parser.parse_args()
 
