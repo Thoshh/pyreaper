@@ -22,6 +22,8 @@ class Walker(object):
     
     _hashDictionary = {}
     _collisions = {}
+    
+    _digestFiles = []
 
     def __init__(self, extension = None, \
                  store_hash = False, \
@@ -40,7 +42,7 @@ class Walker(object):
         self._walk(basepath)
         
         
-    def getCollisions(self):
+    def collisions(self):
         if self._verbose:
             if self._collisions:
                 for key in self._collisions.iterkeys():
@@ -51,6 +53,18 @@ class Walker(object):
                         self._debug("\t" + file)
 
         return self._collisions
+    
+    
+    def digestFiles(self):
+        return self._digestFiles
+        
+        
+    def findEmptyDirs(self, path):
+        emptydirs = []
+        for (dirpath, dirnames, filenames) in os.walk(path):
+            if not filenames and not dirnames:
+                emptydirs.append(dirpath)
+        return emptydirs
         
     
     def _walk(self, walkpath):
@@ -98,6 +112,9 @@ class Walker(object):
                 
                 if digested:
                     self._putValue(digested)
+                    
+                    if os.path.isfile(digestedPath):
+                        self._digestFiles.append(digestedPath)
 
 
     def _digest(self, filepath, digestedPath):
