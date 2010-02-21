@@ -26,30 +26,43 @@ class Cleaner(object):
     _interactive = True
     _verbose = False
     _dontdelete = False
+    _rmcommands = False
+    _noconfirmation = False
     
     def __init__(self, \
-                 duplicates, \
+                 duplicates = None, \
                  interactive = True, \
                  verbose=False,
-                 dontdelete = False ):
+                 dontdelete = False,
+                 rmcommands = False,
+                 noconfirmation = False ):
         self._duplicates = duplicates
         self._verbose = verbose
         self._interactive = interactive
         self._dontdelete = dontdelete
+        self._rmcommands = rmcommands
+        self._noconfirmation = noconfirmation
     
     
     def clean(self):
         
         if not self._dontdelete:
-            if not self._interactive:
+            if not self._interactive and not self._noconfirmation:
                 sure = raw_input("WARNING: this will delete all duplicates " + 
                                  "found but the first one, are you sure? Y/[N] ")
                 if not sure or not (sure.lower() == "y" or sure.lower() == "yes"):
                     print "Quiting"
                     return False
+            elif self._noconfirmation:
+                print "Skipping confirmation..."
+                
         else:
             print "Not deleting anything, no confirmation required"
         
+        if self._rmcommands:
+            print "# Printing cleanup script..."
+            print "# -------------- SCRIPT START --------------"
+            
         for key in self._duplicates.iterkeys():
             files = self._duplicates[key]
             
@@ -57,6 +70,9 @@ class Cleaner(object):
                 self.ask(files)
             else:
                 self.keep_first(files)
+                
+        if self._rmcommands:
+            print "# -------------- SCRIPT END --------------"
     
         return True
         
@@ -97,12 +113,18 @@ class Cleaner(object):
     
     def delete(self, files, keep, quiet = False):
         index = 1
+            
         for file in files:
             if index == keep:
-                self._debug("keeping {0}".format(file))
+                if self._rmcommands:
+                    print " # keeping '{0}'".format(file)
+                else:
+                    self._debug("keeping {0}".format(file))
             else:
                 try:
-                    if self._dontdelete:
+                    if self._rmcommands:
+                        print "rm '{0}'".format(file)
+                    elif self._dontdelete:
                         print "File {0} would have been deleted".format(file)
                     else:
                         if not quiet:
@@ -112,7 +134,7 @@ class Cleaner(object):
                 except:
                     print "Could not delete {0}".format(file)
             index += 1
-            
+
             
     def deleteDir(self, path):
         try:

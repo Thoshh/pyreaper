@@ -42,6 +42,12 @@ def main():
                       action="store_true",
                       help="skips delete process, useful for only " + 
                       "detect duplicates or create the digests")
+    parser.add_option("-p",
+                      "--print-rm-commands",
+                      dest="rmcommands",
+                      action="store_true",
+                      help="skips delete process and prints a set of \"rm\" " + 
+                      "commands so you can delete the duplicate files yourself")
     parser.add_option("-i",
                       "--interactive",
                       dest="interactive",
@@ -49,18 +55,16 @@ def main():
                       help="interactive mode, will ask for each duplicate. " + 
                       "By default it deletes every duplicate found but " + 
                       "the first one")
+    parser.add_option("-y",
+                      "--dont-ask-confirmation",
+                      dest="noconfirmation",
+                      action="store_true",
+                      help="skips confirmation question. ")
     parser.add_option("-s",
                       "--store-hashes",
                       dest="storehash",
                       action="store_true",
-                      help="store calculated hashes in .digest hidden files " + 
-                      "(will delete at the end of the process unless -k " + 
-                      "option is indicated)")
-    parser.add_option("-k",
-                      "--keep-digested",
-                      dest="dontclean",
-                      action="store_true",
-                      help="keeps .digest files when finishes")
+                      help="store and keep calculated hashes in .digest hidden files ")
     parser.add_option("-d",
                       "--delete-empty-trees",
                       dest="deletedirs",
@@ -106,25 +110,29 @@ def main():
     
     duplicates = br.collisions()
     clean = False
-    c = Cleaner(duplicates, \
-                options.interactive, \
-                options.verbose,
-                options.dontdelete)
     
     if duplicates:
         print "Duplicates found, cleaning..."
+        c = Cleaner(duplicates, \
+                options.interactive, \
+                options.verbose,
+                options.dontdelete,
+                options.rmcommands,
+                options.noconfirmation)
         clean = c.clean()
         
     else:
         print "No duplicates found"
         
-    if not options.dontclean:
-        if options.storehash:
-            print "Deleting digest files..."
+    if not options.storehash:
+        print "Deleting digest files..."
+        c = Cleaner(verbose = options.verbose)
         c.delete(br.digestFiles(), -1, True)
         
         
-    if options.deletedirs:
+    if options.deletedirs and not (options.rmcommands or
+                                   options.dontdelete):
+        c = Cleaner(verbose = options.verbose)
         for path in args:
             empty_dirs = br.findEmptyDirs(path)
             for dir in empty_dirs:
