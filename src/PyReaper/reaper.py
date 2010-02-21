@@ -130,13 +130,15 @@ def main():
         c.delete(br.digestFiles(), -1, True)
         
         
-    if options.deletedirs and not (options.rmcommands or
-                                   options.dontdelete):
+    if options.deletedirs:
         c = Cleaner(verbose = options.verbose)
         for path in args:
             empty_dirs = br.findEmptyDirs(path)
             for dir in empty_dirs:
-                c.deleteDir(dir)
+                if options.rmcommands or options.dontdelete:
+                    print "Keeping empty tree {0}".format(dir)
+                else:
+                    c.deleteDir(dir)
         
     if clean:
         sys.exit(0)
