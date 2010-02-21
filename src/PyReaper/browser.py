@@ -98,12 +98,15 @@ class Walker(object):
                 if file.startswith("."): # ignore hidden files
                     continue
                 
-                (name, extension) = splitext(file)
-                if self._extension != None and lower(extension[1:]) != lower(self._extension):
-                    continue
+                
+                if self._extension != None:
+                    (name, extension) = splitext(file)
+                    if lower(extension[1:]) != lower(self._extension):
+                        self._debug("skipping file {0}".format(name))
+                        continue
                 
                 filepath = join(dirpath, file)
-                digestedPath = join(dirpath, '.{0}.digest'.format(name))
+                digestedPath = join(dirpath, '.{0}.digest'.format(file))
                 
                 if not self._ignore_hashes:
                     try:
