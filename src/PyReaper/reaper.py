@@ -37,11 +37,20 @@ def main():
                           "use -n option first if you are not sure of " + 
                           "what are you doing, this thing deletes stuff!!!")
     parser.add_option("-n",
-                      "--dont-delete",
-                      dest="dontdelete",
+                      "--no-action",
+                      dest="noaction",
                       action="store_true",
-                      help="skips delete process, useful for only " + 
-                      "detect duplicates or create the digests")
+                      help="does not executes any file action")
+    parser.add_option("-d",
+                      "--delete",
+                      dest="delete",
+                      action="store_true",
+                      help="delete every duplicated file")
+    parser.add_option("-m", 
+                      "--move-to",
+                      dest="moveto",
+                      metavar="DIR",
+                      help='Moves duplicated files instead of deleting them')
     parser.add_option("-p",
                       "--print-rm-commands",
                       dest="rmcommands",
@@ -65,7 +74,7 @@ def main():
                       dest="storehash",
                       action="store_true",
                       help="store and keep calculated hashes in .digest hidden files ")
-    parser.add_option("-d",
+    parser.add_option("-t",
                       "--delete-empty-trees",
                       dest="deletedirs",
                       action="store_true",
@@ -92,33 +101,61 @@ def main():
     (options, args) = parser.parse_args()
 
     if not args:
-        parser.print_help()
-        sys.exit(1)
+        exit_with_error('', parser)
     
     br = Walker(options.extension, \
 			options.storehash, \
 			options.verbose, \
 			options.ignorehashes)
+
+    action = None
+    moveto = None
+    rmcommands = False
     
+    if options.noaction:
+        action = 'n'
+        
+    elif options.moveto:
+        action = 'm'
+        moveto = options.moveto
+        
+        if not moveto:
+            exit_with_error('No "move to" target provided', parser)
+            
+        elif not os.path.exists(moveto):
+            exit_with_error('Path %s does not exists' % moveto, parser)
+            
+        elif not os.path.isdir(moveto):
+            exit_with_error('Path %s is not a directory' % moveto, parser)
+        
+    elif options.delete:
+        action = 'd'
+        rmcommands = options.rmcommands
+        
+        
+    if action is None:
+        exit_with_error('No action selected', parser)
+
     for path in args:
         if not os.path.exists(path):
-            parser.print_help()
-            print "path {0} does not exists".format(path)
-            sys.exit(1)
-            
+            exit_with_error("path {0} does not exists".format(path), parser)
         br.digest(path)
     
     duplicates = br.collisions()
     clean = False
     
     if duplicates:
+
         print "Duplicates found, cleaning..."
-        c = Cleaner(duplicates, \
-                options.interactive, \
-                options.verbose,
-                options.dontdelete,
-                options.rmcommands,
-                options.noconfirmation)
+        c = Cleaner(
+                    duplicates,
+                    options.interactive,
+                    options.verbose,
+                    action,
+                    rmcommands,
+                    options.noconfirmation,
+                    moveto)
+
         clean = c.clean()
         
     else:
@@ -145,6 +182,13 @@ def main():
     else:
         sys.exit(1)
 
+
+def exit_with_error(message, parser):
+    if message:
+        print message
+    parser.print_help()
+    sys.exit(1)
+    
 
 if __name__ == '__main__':
     main()

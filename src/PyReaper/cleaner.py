@@ -22,62 +22,86 @@ import os
 
 class Cleaner(object):
     
-    _duplicates = None
-    _interactive = True
-    _verbose = False
-    _dontdelete = False
-    _rmcommands = False
-    _noconfirmation = False
+    __duplicates = None
+    __interactive = True
+    __verbose = False
+    __rmcommands = False
+    __noconfirmation = False
+    __action = 'd'
+    _moveto = None
     
     def __init__(self, \
-                 duplicates = None, \
-                 interactive = True, \
+                 duplicates = None,
+                 interactive = True,
                  verbose=False,
-                 dontdelete = False,
+                 action = 'n',
                  rmcommands = False,
-                 noconfirmation = False ):
-        self._duplicates = duplicates
-        self._verbose = verbose
-        self._interactive = interactive
-        self._dontdelete = dontdelete
-        self._rmcommands = rmcommands
-        self._noconfirmation = noconfirmation
+                 noconfirmation = False,
+                 moveto = None ):
+        self.__duplicates = duplicates
+        self.__verbose = verbose
+        self.__interactive = interactive
+        self.__rmcommands = rmcommands
+        self.__noconfirmation = noconfirmation
+        self.__action = action
+        self._moveto = moveto
     
     
     def clean(self):
         
-        if not self._dontdelete:
-            if not self._interactive and not self._noconfirmation:
+        action_command = 'no_action'
+        
+        if self.__action == 'd':
+            if self.__rmcommands:
+                action_command = 'print_delete'
+            else:
+                action_command = 'delete'
+
+            if not self.__interactive and not self.__noconfirmation:
                 sure = raw_input("WARNING: this will delete all duplicates " + 
                                  "found but the first one, are you sure? Y/[N] ")
                 if not sure or not (sure.lower() == "y" or sure.lower() == "yes"):
                     print "Quiting"
                     return False
-            elif self._noconfirmation:
+                
+            elif self.__noconfirmation:
                 print "Skipping confirmation..."
                 
-        else:
+        elif self.__action == 'm':
+            action_command = 'move'
+            
+            if self._moveto is None:
+                print 'Requested action is "move" but no destination path was provided'
+            
+            if not os.path.exists(self._moveto):
+                print 'Requested action is "move" but no destination path was provided'
+            
+        elif self.__verbose:
             print "Not deleting anything, no confirmation required"
         
-        if self._rmcommands:
+        
+        if self.__rmcommands:
             print "# Printing cleanup script..."
             print "# -------------- SCRIPT START --------------"
             
-        for key in self._duplicates.iterkeys():
-            files = self._duplicates[key]
+        
+        for key in self.__duplicates.iterkeys():
+            files = self.__duplicates[key]
             
-            if not self._dontdelete and self._interactive:
-                self.ask(files)
+            if self.__interactive:
+                self.ask(files, action_command)
             else:
-                self.keep_first(files)
+                self.keep_first(files, action_command)
                 
-        if self._rmcommands:
+        if self.__rmcommands:
             print "# -------------- SCRIPT END --------------"
     
         return True
         
     
-    def ask(self, files):
+    def ask(self, files, action):
+        funct = getattr(self, action)
+        
         print ""
         maxfile = 1
         for file in files:
@@ -92,14 +116,14 @@ class Cleaner(object):
         
         elif str(pick).isdigit():
             index = int(pick)
-            self._debug("deleting index {0} of {1}".format(index, maxfile - 1))
+            self._debug("processing index {0} of {1}".format(index, maxfile - 1))
             
             if index >= maxfile:
                 print "Option not valid (out of range), skipping"
                 return False
             
             else:
-                self.delete(files, index - 1)
+                funct(files, index)
                 return True
                 
         else:
@@ -107,48 +131,78 @@ class Cleaner(object):
             return False
     
     
-    def keep_first(self, files):
-        self.delete(files, 1)
+    def keep_first(self, files, action):
+        funct = getattr(self, action)
+        funct(files, 1)
+    
     
     
     def delete(self, files, keep, quiet = False):
         index = 1
-            
+        
         for file in files:
             if index == keep:
-                if self._rmcommands:
-                    print " # keeping '{0}'".format(file)
-                else:
-                    self._debug("keeping {0}".format(file))
+                self._debug("keeping {0}".format(file))
             else:
                 try:
-                    if self._rmcommands:
-                        print "rm '{0}'".format(file)
-                    elif self._dontdelete:
-                        print "File {0} would have been deleted".format(file)
-                    else:
-                        if not quiet:
-                            print "deleting {0}".format(file)
-                        os.remove(file)
-                        
+                    if not quiet:
+                        print "deleting {0}".format(file)
+                    os.remove(file)
                 except:
                     print "Could not delete {0}".format(file)
             index += 1
-
+    
+    def print_delete(self, files, keep, quiet=False):
+        index = 1
+        
+        for file in files:
+            if index == keep:
+                print " # keeping '{0}'".format(file)
+            else:
+                print "rm '{0}'".format(file)
+            index += 1
+    
+    
+    def move(self, files, keep, quiet=False):
+        index = 1
+        
+        if str(self._moveto).endswith('/'):
+            new_path = os.path.dirname(self._moveto)
+        else:
+            new_path = self._moveto
+        
+        for file in files:
+            if index != keep:
+                new_file = new_path + str(file)
+                new_file_path = os.path.dirname(new_file)
+                if not os.path.exists(new_file_path):
+                    os.makedirs(new_file_path)
+                    
+                os.rename(file, new_file)
+            index += 1
+    
+    
+    def no_action(self, files, keep, quiet=False):
+        index = 1
+        
+        for file in files:
+            if index != keep:
+                print "File '{0}' would have been deleted".format(file)
+            index += 1
+    
+    
             
     def deleteDir(self, path):
         try:
-            if self._dontdelete:
-                print "Empty tree {0} would have been deleted".format(path)
-            else:
-                print "Removing empty tree {0}".format(path)
-                os.removedirs(path)
+            print "Removing empty tree {0}".format(path)
+            os.removedirs(path)
         except:
             print "Could not remove {0}".format(path)
             
 
     def _debug(self, message):
-        if self._verbose:
+        if self.__verbose:
             print message
 
-    
+    def build_path(self, files, keep):
+        pass
