@@ -195,6 +195,10 @@ class Cleaner(object):
     def deleteDir(self, path):
         try:
             print "Removing empty tree {0}".format(path)
+	    for digestfile in os.listdir(path):
+		file = os.path.join(path, digestfile)
+		os.remove(file)
+
             os.removedirs(path)
         except:
             print "Could not remove {0}".format(path)

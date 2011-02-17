@@ -80,6 +80,18 @@ class Walker(object):
         for (dirpath, dirnames, filenames) in os.walk(path):
             if not filenames and not dirnames:
                 emptydirs.append(dirpath)
+	    elif not dirnames:
+		digest_only = True
+		for filename in filenames:
+		    if filename.startswith('.') and filename.endswith('.digest'):
+			continue
+		    else:
+		        digest_only = False
+
+		if digest_only:
+                    emptydirs.append(dirpath)
+
+
         return emptydirs
         
     
