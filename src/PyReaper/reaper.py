@@ -172,7 +172,7 @@ def main():
         for path in args:
             empty_dirs = br.findEmptyDirs(path)
             for dir in empty_dirs:
-                if options.rmcommands or options.dontdelete:
+                if options.rmcommands or options.noaction:
                     print "Keeping empty tree {0}".format(dir)
                 else:
                     c.deleteDir(dir)
